@@ -2,31 +2,60 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Tymon\JWTAuth\Contracts\JWTSubject; // Wajib untuk JWT
 
-#[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'remember_token'])]
-class User extends Authenticatable
+class User extends Authenticatable implements JWTSubject
 {
-    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * Atribut yang dapat diisi secara massal.
+     * Kita tambahkan 'role' agar bisa membedakan Admin dan Member.
+     */
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'role', 
+    ];
+
+    /**
+     * Atribut yang harus disembunyikan dari JSON.
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * Casting atribut untuk keamanan password.
      */
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+        ];
+    }
+
+    /**
+     * Implementasi JWT: Mengambil ID User untuk disimpan di token.
+     */
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    /**
+     * Implementasi JWT: Menyisipkan data tambahan (role) ke dalam token.
+     */
+    public function getJWTCustomClaims()
+    {
+        return [
+            'role' => $this->role // Role tersimpan aman di dalam token
         ];
     }
 }
