@@ -12,12 +12,25 @@ class SpotController extends Controller
     // PUBLIC: list published spots
     public function index()
     {
-        $spots = Spot::where('status', 'open')->latest()->paginate(10);
+        $spots = Spot::where('status', 'open')
+            ->latest()
+            ->paginate(10)
+            ->through(fn($spot) => [
+                'id'         => $spot->id,
+                'title'      => $spot->title,
+                'thumbnail'  => $spot->thumbnail,
+                'category'   => $spot->category,
+                'location'   => $spot->location,
+                'event_date' => $spot->event_date,
+                'price'      => $spot->price,
+                'status'     => $spot->status,
+            ]);
+
         return response()->json(['success' => true, 'data' => $spots]);
     }
 
     // PUBLIC: detail single spot
-    public function show($id)
+    public function show(int $id)
     {
         $spot = Spot::find($id);
         if (!$spot) return response()->json(['success' => false, 'message' => 'Spot tidak ditemukan'], 404);
@@ -27,7 +40,20 @@ class SpotController extends Controller
     // ADMIN: list all spots (including drafts/closed)
     public function adminIndex()
     {
-        $spots = Spot::latest()->paginate(10);
+        $spots = Spot::latest()
+            ->paginate(10)
+            ->through(fn($spot) => [
+                'id'                => $spot->id,
+                'title'             => $spot->title,
+                'thumbnail'         => $spot->thumbnail,
+                'category'          => $spot->category,
+                'location'          => $spot->location,
+                'event_date'        => $spot->event_date,
+                'price'             => $spot->price,
+                'status'            => $spot->status,
+                'participant_limit' => $spot->participant_limit,
+            ]);
+
         return response()->json(['success' => true, 'data' => $spots]);
     }
 
