@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Spot;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class SpotController extends Controller
 {
@@ -60,19 +61,27 @@ class SpotController extends Controller
     // ADMIN: create spot
     public function store(Request $request)
     {
-        $request->validate([
-            'title'              => 'required|string',
-            'thumbnail'          => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'description'        => 'required',
-            'category'           => 'required|string',
-            'location'           => 'required|string',
-            'event_date'         => 'required|date',
-            'organizer'          => 'required|string',
-            'price'              => 'required|integer',
-            'participant_limit'  => 'nullable|integer',
-            'registration_link'  => 'nullable|url',
-            'status'             => 'required|in:open,closed,draft',
+        $validator = Validator::make($request->all(), [
+            'title'             => 'required|string',
+            'thumbnail'         => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'description'       => 'required',
+            'category'          => 'required|in:Competition,Convention,Concert,Workshop,Exhibition,Festival,Community Meetup',
+            'location'          => 'required|string',
+            'event_date'        => 'required|date',
+            'organizer'         => 'required|string',
+            'price'             => 'required|integer',
+            'participant_limit' => 'nullable|integer',
+            'registration_link' => 'nullable|url',
+            'status'            => 'required|in:open,closed,draft',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors'  => $validator->errors()
+            ], 422);
+        }
 
         $image = $request->file('thumbnail');
         $image->storeAs('public/spots', $image->hashName());
@@ -82,7 +91,11 @@ class SpotController extends Controller
             'thumbnail' => $image->hashName(),
         ]);
 
-        return response()->json(['success' => true, 'message' => 'Spot berhasil ditambahkan', 'data' => $spot], 201);
+        return response()->json([
+            'success' => true,
+            'message' => 'Spot berhasil ditambahkan',
+            'data'    => $spot
+        ], 201);
     }
 
     // ADMIN: update spot

@@ -15,7 +15,44 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
         ]);
+
+        // Tell Laravel not to redirect API requests to a login route
+        $middleware->redirectGuestsTo(function ($request) {
+            if ($request->is('api/*')) {
+                return null;
+            }
+        });
     })
-    ->withExceptions(function (Exceptions $exceptions): void {
-        //
+    ->withExceptions(function (Exceptions $exceptions) {
+        // Handle unauthenticated (no token)
+        $exceptions->render(function (\Illuminate\Auth\AuthenticationException $e, \Illuminate\Http\Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthenticated. Silakan login terlebih dahulu.'
+                ], 401);
+            }
+        });
+
+        // Handle expired/invalid JWT token
+        $exceptions->render(function (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e, \Illuminate\Http\Request $request) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token sudah kadaluarsa. Silakan login ulang.'
+            ], 401);
+        });
+
+        $exceptions->render(function (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e, \Illuminate\Http\Request $request) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token tidak valid.'
+            ], 401);
+        });
+
+        $exceptions->render(function (\Tymon\JWTAuth\Exceptions\JWTException $e, \Illuminate\Http\Request $request) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token tidak ditemukan.'
+            ], 401);
+        });
     })->create();
