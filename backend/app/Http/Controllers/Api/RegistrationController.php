@@ -47,12 +47,14 @@ class RegistrationController extends Controller
     // MEMBER: cancel my registration
     public function cancel($spot_id)
     {
-        $registration = Registration::where('user_id', Auth::id())->where('spot_id', $spot_id)->first();
+        $registration = Registration::where('user_id', Auth::id())
+            ->where('spot_id', $spot_id)
+            ->first();
 
         if (!$registration)
             return response()->json(['success' => false, 'message' => 'Registrasi tidak ditemukan'], 404);
 
-        $registration->update(['status' => 'cancelled']);
+        $registration->delete();
 
         return response()->json(['success' => true, 'message' => 'Registrasi dibatalkan']);
     }

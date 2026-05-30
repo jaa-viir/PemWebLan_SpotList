@@ -84,7 +84,7 @@ class SpotController extends Controller
         }
 
         $image = $request->file('thumbnail');
-        $image->storeAs('public/spots', $image->hashName());
+        $image->storeAs('public/spots', $image->hashName(), 'public');
 
         $spot = Spot::create([
             ...$request->except('thumbnail'),
@@ -121,7 +121,7 @@ class SpotController extends Controller
 
         if ($request->hasFile('thumbnail')) {
             $image = $request->file('thumbnail');
-            $image->storeAs('public/spots', $image->hashName());
+            $image->storeAs('public/spots', $image->hashName(), 'public');
             Storage::delete('public/spots/' . basename($spot->getRawOriginal('thumbnail')));
             $data['thumbnail'] = $image->hashName();
         }

@@ -70,7 +70,7 @@ export async function apiCreateSpot(formData) {
 }
 
 export async function apiUpdateSpot(id, formData) {
-	formData.append("_method", "PUT");
+	formData.append("_method", "POST");
 	const res = await fetch(`${BASE_URL}/spots/${id}`, {
 		method: "POST",
 		headers: authHeaders(),
