@@ -24,7 +24,7 @@ class Spot extends Model
     protected function thumbnail(): Attribute
     {
         return Attribute::make(
-            get: fn($value) => url('/storage/spots/' . $value),
+            get: fn($value) => url('/storage/public/spots/' . $value),
         );
     }
 

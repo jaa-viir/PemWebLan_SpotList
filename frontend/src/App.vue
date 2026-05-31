@@ -2,34 +2,32 @@
 	<div id="app">
 		<header class="navbar-wrapper">
 			<nav class="navbar">
-				<router-link to="/" class="brand">SpotList</router-link>
+				<router-link to="/" class="brand"> <i class="fa-solid fa-calendar-check"></i> SpotList </router-link>
 
 				<div class="nav-links">
-					<router-link to="/">Spots</router-link>
-					<router-link v-if="auth.isLoggedIn" to="/my-registrations">My Registrations</router-link>
-					<router-link v-if="auth.isAdmin" to="/admin/spots">Admin Panel</router-link>
+					<router-link to="/"><i class="fa-solid fa-magnifying-glass"></i> Spots</router-link>
+					<router-link v-if="auth.isLoggedIn" to="/my-registrations"> <i class="fa-solid fa-ticket"></i> My Registrations </router-link>
+					<router-link v-if="auth.isAdmin" to="/admin/spots"> <i class="fa-solid fa-database"></i> All Spots </router-link>
 				</div>
 
 				<div class="nav-user">
 					<template v-if="auth.isLoggedIn">
-						<span class="user-info">{{ auth.user.name }} · {{ auth.user.role }}</span>
-						<button class="btn-secondary" @click="logout">Logout</button>
+						<span class="user-info"> <i class="fa-solid fa-circle-user"></i> {{ auth.user.name }} </span>
+						<button class="btn-secondary" @click="logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
 					</template>
 					<template v-else>
-						<router-link to="/login">Login</router-link>
-						<router-link to="/register" class="btn-primary-link">Register</router-link>
+						<router-link to="/login" class="btn-nav-outline"> <i class="fa-solid fa-right-to-bracket"></i> Login </router-link>
+						<router-link to="/register" class="btn-nav-primary"> <i class="fa-solid fa-user-plus"></i> Register </router-link>
 					</template>
 				</div>
 			</nav>
 		</header>
 
-		<!-- Flash message — any page can trigger this via the flash store -->
 		<div v-if="flash.message" :class="['flash', flash.type]">
 			{{ flash.message }}
 		</div>
 
-		<!-- All pages render here -->
-		<main class="page-content">
+		<main :class="['page-content', { 'no-padding': isAuthPage }]">
 			<router-view />
 		</main>
 	</div>
@@ -38,13 +36,22 @@
 <script>
 import { useAuthStore } from "./stores/auth.js";
 import { useFlashStore } from "./stores/flash.js";
+import { useRoute } from "vue-router"; // Import this
+import { computed } from "vue"; // Import this
 
 export default {
 	name: "App",
 	setup() {
 		const auth = useAuthStore();
 		const flash = useFlashStore();
-		return { auth, flash };
+		const route = useRoute();
+
+		// Check if the current path is login or register
+		const isAuthPage = computed(() => {
+			return route.path === "/login" || route.path === "/register";
+		});
+
+		return { auth, flash, isAuthPage };
 	},
 	methods: {
 		async logout() {
@@ -99,6 +106,10 @@ a {
 	background: var(--surface);
 	border-bottom: 1px solid var(--border);
 	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+
+	position: sticky;
+	top: 0;
+	z-index: 50;
 }
 
 .navbar {
@@ -127,11 +138,19 @@ a {
 	color: var(--text-muted);
 	font-weight: 500;
 	font-size: 0.95rem;
+	display: flex;
+	align-items: center;
 	transition: color 0.2s;
 }
 .nav-links a:hover,
 .nav-links a.router-link-active {
 	color: var(--primary);
+}
+
+.nav-links a i,
+.nav-user i {
+	margin-right: 8px; /* Adds breathing room between icon and text */
+	font-size: 0.9em; /* Keeps icons slightly smaller than text for elegance */
 }
 
 .nav-user {
@@ -144,12 +163,43 @@ a {
 	color: var(--text-muted);
 }
 
+.btn-nav-outline {
+	padding: 0.5rem 1rem;
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	font-weight: 600;
+	font-size: 0.9rem;
+	transition: all 0.2s;
+}
+.btn-nav-outline:hover {
+	background: #f1f5f9;
+}
+
+.btn-nav-primary {
+	padding: 0.5rem 1rem;
+	background: var(--primary);
+	color: white;
+	border-radius: var(--radius);
+	font-weight: 600;
+	font-size: 0.9rem;
+	transition: background 0.2s;
+}
+.btn-nav-primary:hover {
+	background: var(--primary-hover);
+}
+
 /* 4. Page Content */
 .page-content {
 	width: 100%;
 	max-width: var(--max-width);
 	margin: 0 auto;
 	padding: 2rem;
+}
+
+/* Add this new rule to override the padding and max-width for full-bleed pages */
+.page-content.no-padding {
+	padding: 0;
+	max-width: 100%;
 }
 
 /* 5. Modern Buttons */

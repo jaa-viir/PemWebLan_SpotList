@@ -12,7 +12,7 @@
 
 			<p v-if="error" class="form-error"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</p>
 
-			<button @click="submit" :disabled="loading" class="btn-submit">
+			<button @click="submit" :disabled="loading" class="btn-submit btn-primary">
 				<span v-if="loading"><i class="fa-solid fa-spinner fa-spin"></i> Registering...</span>
 				<span v-else>Create Account</span>
 			</button>
@@ -50,50 +50,80 @@ export default {
 </script>
 
 <style scoped>
+/* 1. Background Image and Layout */
 .auth-page {
+	position: relative;
 	display: flex;
 	justify-content: center;
-	padding: 60px 20px;
+	align-items: center;
+	min-height: calc(100vh - 70px);
+	padding: 40px 20px;
+	overflow: hidden;
 }
 
+/* 2. The Blurred Background Layer */
+.auth-page::before {
+	content: "";
+	position: absolute;
+	top: -20px;
+	left: -20px;
+	right: -20px;
+	bottom: -20px;
+	background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url("@/assets/auth-bg.jpg");
+	background-size: cover;
+	background-position: center;
+	background-attachment: fixed;
+	filter: blur(8px);
+	z-index: 0;
+}
+
+/* 3. The Card */
 .auth-card {
+	position: relative;
+	z-index: 1;
 	width: 100%;
-	max-width: 400px;
+	max-width: 420px;
 	background: var(--surface);
-	border: 1px solid var(--border);
-	border-radius: var(--radius);
-	padding: 32px;
-	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+	border-radius: 16px;
+	padding: 40px;
+	box-shadow:
+		0 20px 25px -5px rgba(0, 0, 0, 0.1),
+		0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 .auth-card h1 {
-	font-size: 1.5rem;
+	font-size: 1.75rem;
+	font-weight: 800;
 	margin-bottom: 8px;
 	color: var(--text-main);
 }
 
 .auth-card p {
 	margin-bottom: 24px;
-	font-size: 0.9rem;
+	font-size: 0.95rem;
 	color: var(--text-muted);
 }
 
 .auth-card a {
 	color: var(--primary);
-	font-weight: 600;
+	font-weight: 700;
 }
 
+/* 4. Form Spacing */
 .form-group {
-	margin-bottom: 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	margin-bottom: 24px;
 }
 
 .form-error {
 	color: #991b1b;
 	background: #fee2e2;
-	padding: 10px;
+	padding: 12px;
 	border-radius: var(--radius);
 	font-size: 0.85rem;
-	margin-bottom: 16px;
+	margin-bottom: 20px;
 	display: flex;
 	align-items: center;
 	gap: 8px;
@@ -101,12 +131,23 @@ export default {
 
 .btn-submit {
 	width: 100%;
-	padding: 0.75rem;
+	padding: 0.85rem;
+	font-size: 1rem;
 	font-weight: 600;
 	background: var(--primary);
+	border: none;
+	border-radius: var(--radius);
+	color: white;
+	cursor: pointer;
 }
 
 .btn-submit:hover {
 	background: var(--primary-hover);
+}
+
+@media (max-width: 640px) {
+	.auth-card {
+		padding: 32px 24px;
+	}
 }
 </style>
