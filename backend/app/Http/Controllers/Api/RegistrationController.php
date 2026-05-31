@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Auth;
 
 class RegistrationController extends Controller
 {
-    // MEMBER: register for a spot
     public function register($spot_id)
     {
         $spot = Spot::find($spot_id);
@@ -33,7 +32,6 @@ class RegistrationController extends Controller
         return response()->json(['success' => true, 'message' => 'Berhasil mendaftar event', 'data' => $registration], 201);
     }
 
-    // MEMBER: view my registrations
     public function myRegistrations()
     {
         $registrations = Registration::with('spot')
@@ -44,7 +42,6 @@ class RegistrationController extends Controller
         return response()->json(['success' => true, 'data' => $registrations]);
     }
 
-    // MEMBER: cancel my registration
     public function cancel($spot_id)
     {
         $registration = Registration::where('user_id', Auth::id())
@@ -59,7 +56,6 @@ class RegistrationController extends Controller
         return response()->json(['success' => true, 'message' => 'Registrasi dibatalkan']);
     }
 
-    // ADMIN: view all registrations for a spot
     public function spotRegistrations($spot_id)
     {
         $spot = Spot::find($spot_id);

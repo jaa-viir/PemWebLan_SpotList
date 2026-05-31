@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Casts\Attribute; // Import Attribute untuk Accessor
+use Illuminate\Database\Eloquent\Casts\Attribute; 
 
 class Guide extends Model
 {
@@ -29,7 +29,7 @@ class Guide extends Model
     /**
      * Accessor untuk mempermudah pemanggilan URL gambar di Flutter/Frontend
      */
-    public function bannerImage(): Attribute // Nama fungsi disesuaikan dengan nama kolom (camelCase)
+    public function bannerImage(): Attribute 
     {
         return Attribute::make(
             get: fn ($image) => $image ? url('/storage/guides/' . $image) : null,

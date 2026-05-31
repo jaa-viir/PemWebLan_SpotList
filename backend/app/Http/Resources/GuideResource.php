@@ -7,11 +7,14 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class GuideResource extends JsonResource
 {
-    // Properti untuk status dan pesan
+    // Definisikan properti kustom untuk menampung data dari Controller
     public $status;
     public $message;
+    public $resource;
 
-    // Constructor untuk mengisi properti
+    /**
+     Map constructor untuk menerima parameter kustom
+     */
     public function __construct($status, $message, $resource)
     {
         parent::__construct($resource);
@@ -20,17 +23,14 @@ class GuideResource extends JsonResource
     }
 
     /**
-     * Transform data menjadi array
-     *
-     * @return array<string, mixed>
+     Transform the resource into an array.
      */
     public function toArray(Request $request): array
     {
         return [
             'success'   => $this->status,
             'message'   => $this->message,
-            // $this->resource berisi data model Guide yang dikirim dari controller
-            'data'      => $this->resource
+            'data'      => $this->resource,
         ];
     }
 }

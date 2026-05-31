@@ -15,8 +15,13 @@ class GuideController extends Controller
     // Method untuk menampilkan semua data guides
     public function index()
     {
-        $guides = Guide::latest()->paginate(5);
-        return new GuideResource(true, 'List Data Guides', $guides);
+        $guides = Guide::with('user')->latest()->get();
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'List Data Guides',
+            'data'    => $guides
+        ], 200);
     }
 
     public function store(Request $request)
@@ -40,30 +45,40 @@ class GuideController extends Controller
         $guide = Guide::create([
             'banner_image' => $image->hashName(),
             'title'        => $request->title,
-            'slug'         => Str::slug($request->title), // Generate slug otomatis
+            'slug'         => Str::slug($request->title), 
             'content'      => $request->content,
-            'user_id'      => auth('api')->id(), // Ambil ID Admin yang sedang login
+            'user_id'      => auth('api')->id(), 
         ]);
 
-        return new GuideResource(true, 'Data Guide Berhasil Ditambahkan!', $guide);
+        return response()->json([
+            'success' => true,
+            'message' => 'Data Guide Berhasil Ditambahkan!',
+            'data'    => $guide
+        ], 201);
     }
 
     // Menampilkan detail data guide
     public function show($id)
     {
-        $guide = Guide::find($id);
+        $guide = Guide::with('user')->find($id);
         
         if (!$guide) {
-            return response()->json(['message' => 'Data tidak ditemukan'], 404);
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak ditemukan'
+            ], 404);
         }
         
-        return new GuideResource(true, 'Detail Data Guide!', $guide);
+        return response()->json([
+            'success' => true,
+            'message' => 'Detail Data Guide!',
+            'data'    => $guide
+        ], 200);
     }
 
     // Mengubah data guide
     public function update(Request $request, $id)
     {
-        // 1. Cari data guide berdasarkan ID
         $guide = Guide::find($id);
         
         if (!$guide) {
@@ -73,7 +88,6 @@ class GuideController extends Controller
             ], 404);
         }
 
-        // 2. Validasi input
         $validator = Validator::make($request->all(), [
             'banner_image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'title'        => 'required',
@@ -84,21 +98,15 @@ class GuideController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
-        // 3. Cek apakah ada file gambar baru yang diunggah
         if ($request->hasFile('banner_image')) {
-
-            // Upload gambar baru ke folder storage/app/public/guides
             $image = $request->file('banner_image');
             $image->storeAs('public/guides', $image->hashName());
 
-            // Hapus gambar lama dari storage agar tidak memenuhi server
-            // Menggunakan getAttribute untuk menghindari error protected visibility
             $oldImage = $guide->getAttribute('banner_image');
             if ($oldImage) {
                 Storage::delete('public/guides/' . $oldImage);
             }
 
-            // Update data guide dengan gambar baru
             $guide->update([
                 'banner_image' => $image->hashName(),
                 'title'        => $request->title,
@@ -107,8 +115,6 @@ class GuideController extends Controller
             ]);
 
         } else {
-            
-            // Update data guide tanpa mengganti gambar
             $guide->update([
                 'title'   => $request->title,
                 'slug'    => Str::slug($request->title),
@@ -116,8 +122,11 @@ class GuideController extends Controller
             ]);
         }
 
-        // 4. Return response menggunakan GuideResource
-        return new GuideResource(true, 'Data Guide Berhasil Diubah!', $guide);
+        return response()->json([
+            'success' => true,
+            'message' => 'Data Guide Berhasil Diubah!',
+            'data'    => $guide
+        ], 200);
     }
 
     // Menghapus data guide
@@ -128,16 +137,7 @@ class GuideController extends Controller
             return response()->json(['message' => 'Data tidak ditemukan'], 404);
         }
 
-        // Hapus gambar dari storage
         Storage::delete('public/guides/'.basename($guide->banner_image));
-        // Atau jika menggunakan getAttribute untuk menghindari error protected visibility
-        // $namaFileAsli = $guide->getAttributes()['banner_image'] ?? null;
-        // if ($namaFileAsli) {
-        //     Storage::delete('public/guides/' . $namaFileAsli);
-        // }
-
-
-        // Hapus data dari database
         $guide->delete();
 
         return response()->json([
