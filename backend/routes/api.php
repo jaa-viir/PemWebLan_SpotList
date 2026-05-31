@@ -37,6 +37,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('spots/{id}',              [SpotController::class, 'update']); // POST + _method=PUT
         Route::delete('spots/{id}',            [SpotController::class, 'destroy']);
         Route::get('spots/{id}/registrations', [RegistrationController::class, 'spotRegistrations']);
+        Route::put('/registrations/{id}/confirm', [RegistrationController::class, 'confirmRegistration']);
 
         // Guides management
         Route::post('guides',                  [GuideController::class, 'store']);

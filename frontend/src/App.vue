@@ -11,10 +11,19 @@
 				</div>
 
 				<div class="nav-user">
+					<!-- Logged In State -->
 					<template v-if="auth.isLoggedIn">
-						<span class="user-info"> <i class="fa-solid fa-circle-user"></i> {{ auth.user.name }} </span>
+						<div class="user-profile">
+							<i class="fa-solid fa-circle-user profile-icon"></i>
+							<div class="user-meta">
+								<span class="user-name">{{ auth.user.name }}</span>
+								<span class="user-role">{{ auth.user.role }}</span>
+							</div>
+						</div>
 						<button class="btn-secondary" @click="logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
 					</template>
+
+					<!-- Guest State -->
 					<template v-else>
 						<router-link to="/login" class="btn-nav-outline"> <i class="fa-solid fa-right-to-bracket"></i> Login </router-link>
 						<router-link to="/register" class="btn-nav-primary"> <i class="fa-solid fa-user-plus"></i> Register </router-link>
@@ -161,6 +170,47 @@ a {
 .nav-user .user-info {
 	font-size: 0.85rem;
 	color: var(--text-muted);
+}
+
+/* Container for the user info group */
+.user-profile {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 4px 12px;
+	background: #f1f5f9; /* Subtle gray background to frame the identity */
+	border-radius: 999px; /* Rounded pill shape */
+	margin-right: 8px;
+}
+
+.profile-icon {
+	font-size: 1.25rem;
+	color: var(--primary);
+}
+
+.user-meta {
+	display: flex;
+	flex-direction: column;
+	line-height: 1.1;
+}
+
+.user-name {
+	font-size: 0.85rem;
+	font-weight: 700;
+	color: var(--text-main);
+}
+
+.user-role {
+	font-size: 0.7rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	color: var(--text-muted);
+	letter-spacing: 0.02em;
+}
+
+/* Adjust the logout button spacing */
+.nav-user button {
+	margin-left: 4px;
 }
 
 .btn-nav-outline {

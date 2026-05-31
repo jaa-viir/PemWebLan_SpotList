@@ -116,3 +116,11 @@ export async function apiSpotRegistrations(spotId) {
 	});
 	return res.json();
 }
+
+export async function apiConfirmRegistration(registrationId) {
+	const res = await fetch(`${BASE_URL}/registrations/${registrationId}/confirm`, {
+		method: "PUT",
+		headers: authHeaders(),
+	});
+	return res.json();
+}

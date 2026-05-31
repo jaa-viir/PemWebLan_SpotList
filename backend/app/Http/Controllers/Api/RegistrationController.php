@@ -70,4 +70,35 @@ class RegistrationController extends Controller
 
         return response()->json(['success' => true, 'data' => $registrations]);
     }
+
+    /**
+     * ADMIN: Confirm a user's registration
+     * * @param int $registration_id The ID of the registration row
+     */
+    public function confirmRegistration($registration_id)
+    {
+        $registration = Registration::find($registration_id);
+
+        if (!$registration) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Registrasi tidak ditemukan'
+            ], 404);
+        }
+
+        if ($registration->status === 'confirmed') {
+            return response()->json([
+                'success' => true,
+                'message' => 'Registrasi sudah dikonfirmasi sebelumnya'
+            ]);
+        }
+
+        $registration->status = 'confirmed';
+        $registration->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Registrasi berhasil dikonfirmasi'
+        ]);
+    }
 }

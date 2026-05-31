@@ -40,7 +40,12 @@
 						</td>
 						<td class="text-muted">{{ reg.user?.email ?? "-" }}</td>
 						<td>
-							<span class="badge" :class="reg.status">{{ reg.status }}</span>
+							<div class="status-cell">
+								<span class="badge" :class="reg.status">{{ reg.status }}</span>
+								<button v-if="reg.status === 'pending'" class="btn-confirm" @click="confirm(reg)">
+									<i class="fa-solid fa-check"></i>
+								</button>
+							</div>
 						</td>
 						<td class="text-muted">{{ formatDate(reg.created_at) }}</td>
 					</tr>
@@ -51,7 +56,7 @@
 </template>
 
 <script>
-import { apiSpotRegistrations } from "../../services/api.js";
+import { apiSpotRegistrations, apiConfirmRegistration } from "../../services/api.js";
 
 export default {
 	name: "AdminSpotRegsPage",
@@ -72,6 +77,18 @@ export default {
 		formatDate(dt) {
 			if (!dt) return "-";
 			return new Date(dt).toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short" });
+		},
+
+		async confirm(reg) {
+			if (!confirm("Are you sure you want to confirm this attendee?")) return;
+
+			const res = await apiConfirmRegistration(reg.id);
+			if (!res.success) {
+				alert(res.message);
+				return;
+			}
+			// Refresh the list to update status UI
+			reg.status = "confirmed";
 		},
 	},
 };
