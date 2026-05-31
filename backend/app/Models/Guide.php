@@ -32,7 +32,7 @@ class Guide extends Model
     public function bannerImage(): Attribute 
     {
         return Attribute::make(
-            get: fn ($image) => $image ? url('/storage/guides/' . $image) : null,
+            get: fn ($image) => $image ? url('/storage/public/guides/' . $image) : null,
         );
     }
 }
